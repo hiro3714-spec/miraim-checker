@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>身だしなみチェッカー</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --color-text-primary: #1a1a1a;
+      --color-text-secondary: #666;
+      --color-text-tertiary: #999;
+      --color-text-info: #0066cc;
+      --color-text-success: #1a7a3a;
+      --color-text-warning: #7a4a00;
+      --color-text-danger: #cc0000;
+      --color-background-primary: #fff;
+      --color-background-secondary: #f5f5f5;
+      --color-background-tertiary: #ebebeb;
+      --color-background-info: #e8f0fb;
+      --color-background-success: #e8f5ed;
+      --color-background-warning: #fff8e8;
+      --color-border-primary: #1a1a1a;
+      --color-border-secondary: #ccc;
+      --color-border-tertiary: #e5e5e5;
+      --color-border-info: #a0c0f0;
+      --color-border-success: #a0d0b0;
+      --color-border-warning: #f0d080;
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fafafa; color: var(--color-text-primary); min-height: 100vh; }
+    .app { max-width: 480px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+    @media (min-width: 600px) { .app { max-width: 640px; padding: 1.5rem 1.5rem 3rem; } }
+    .header { margin-bottom: 1.25rem; }
+    .header h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+    .header p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+    .notice-box { background: var(--color-background-info); border: 0.5px solid var(--color-border-info); border-radius: var(--border-radius-lg); padding: 11px 13px; margin-bottom: 1rem; font-size: 13px; color: var(--color-text-info); line-height: 1.65; }
+    .privacy-note { font-size: 12px; color: var(--color-text-secondary); display: flex; align-items: center; gap: 6px; margin-bottom: 1.1rem; }
+    .privacy-note i { font-size: 15px; color: var(--color-text-success); flex-shrink: 0; }
+    .upload-zone { border: 1.5px dashed var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 1.75rem 1rem; text-align: center; cursor: pointer; background: var(--color-background-secondary); margin-bottom: 1rem; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; }
+    .upload-zone:active { background: var(--color-background-tertiary); }
+    .upload-zone i { font-size: 36px; color: var(--color-text-secondary); }
+    .upload-zone p { font-size: 14px; color: var(--color-text-secondary); }
+    .upload-zone .hint { font-size: 12px; color: var(--color-text-tertiary); }
+    .camera-btn { width: 100%; padding: 13px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); font-size: 14px; color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1rem; }
+    .camera-btn:active { background: var(--color-background-tertiary); }
+    input[type="file"] { display: none; }
+    .preview-wrap { position: relative; border-radius: var(--border-radius-lg); overflow: hidden; border: 0.5px solid var(--color-border-tertiary); margin-bottom: 1rem; }
+    .preview-wrap img { width: 100%; max-height: 320px; object-fit: contain; display: block; background: var(--color-background-secondary); }
+    .remove-btn { position: absolute; top: 10px; right: 10px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: var(--color-text-secondary); }
+    .scene-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; }
+    .scene-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+    .scene-btn { padding: 7px 13px; border-radius: 999px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); font-size: 13px; color: var(--color-text-secondary); cursor: pointer; min-height: 36px; }
+    .scene-btn.active { background: var(--color-background-info); border-color: var(--color-border-info); color: var(--color-text-info); }
+    .quota-bar { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 12px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+    .quota-label { font-size: 12px; color: var(--color-text-secondary); flex: 1; }
+    .quota-count { font-size: 13px; font-weight: 500; white-space: nowrap; }
+    .quota-track { height: 4px; background: var(--color-border-tertiary); border-radius: 2px; width: 60px; flex-shrink: 0; }
+    .quota-fill { height: 4px; border-radius: 2px; background: var(--color-text-info); transition: width 0.3s; }
+    .analyze-btn { width: 100%; padding: 15px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-primary); border-radius: var(--border-radius-lg); font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1.25rem; min-height: 52px; }
+    .analyze-btn:active:not(:disabled) { background: var(--color-background-secondary); }
+    .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .busy-banner { display: none; background: var(--color-background-warning); border: 0.5px solid var(--color-border-warning); border-radius: var(--border-radius-md); padding: 12px 14px; font-size: 13px; color: var(--color-text-warning); margin-bottom: 1.25rem; text-align: center; line-height: 1.5; }
+    .loading { text-align: center; padding: 2rem; display: none; }
+    .loading i { font-size: 28px; color: var(--color-text-secondary); animation: spin 1s linear infinite; }
+    .loading p { font-size: 13px; color: var(--color-text-secondary); margin-top: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .result { display: none; }
+    .result-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.1rem; }
+    .result-header h2 { font-size: 16px; font-weight: 500; }
+    .score-ring { width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 500; flex-shrink: 0; }
+    .section { margin-bottom: 1.1rem; }
+    .section-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .good-list, .improve-list { list-style: none; }
+    .good-list li, .improve-list li { font-size: 13px; padding: 10px 12px; border-radius: var(--border-radius-md); margin-bottom: 5px; display: flex; align-items: flex-start; gap: 9px; line-height: 1.5; }
+    .good-list li { background: var(--color-background-success); color: var(--color-text-success); }
+    .good-list li i { color: var(--color-text-success); flex-shrink: 0; margin-top: 1px; font-size: 16px; }
+    .improve-list li { background: var(--color-background-warning); color: var(--color-text-warning); }
+    .improve-list li i { color: var(--color-text-warning); flex-shrink: 0; margin-top: 1px; font-size: 16px; }
+    .scene-detected { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 999px; background: var(--color-background-info); color: var(--color-text-info); font-size: 12px; margin-bottom: 1rem; }
+    .advice-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.1rem; font-size: 13px; line-height: 1.7; }
+    .retry-btn { width: 100%; padding: 13px; background: transparent; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); font-size: 14px; color: var(--color-text-secondary); cursor: pointer; margin-top: 1rem; min-height: 48px; }
+    .retry-btn:active { background: var(--color-background-secondary); }
+    .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.1rem 0; }
+    .footer-links { display: flex; gap: 16px; justify-content: center; margin-top: 2rem; padding-top: 1rem; border-top: 0.5px solid var(--color-border-tertiary); flex-wrap: wrap; }
+    .footer-links a { font-size: 12px; color: var(--color-text-tertiary); text-decoration: none; padding: 4px 0; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1><i class="ti ti-shirt" style="font-size:17px;vertical-align:-2px;margin-right:6px;"></i>身だしなみチェッカー</h1>
+    <p>写真をアップするだけ。AIが清潔感・コーデを評価します</p>
+  </div>
+
+  <div class="notice-box">
+    <i class="ti ti-info-circle" style="font-size:14px;vertical-align:-2px;margin-right:4px;"></i>
+    評価するのは<strong>服装・清潔感</strong>のみ。顔・体型などルックスは一切評価しません。「不潔に見られない最低限」を確認するツールです。
+  </div>
+
+  <div class="privacy-note">
+    <i class="ti ti-shield-check"></i>
+    写真はサーバーに保存されません。診断後すぐに削除されます。
+  </div>
+
+  <div id="uploadSection">
+    <div class="upload-zone" id="uploadZone">
+      <i class="ti ti-photo-up"></i>
+      <p>タップして写真を選ぶ</p>
+      <p class="hint">全身が写っている写真がおすすめ</p>
+    </div>
+    <input type="file" id="fileInput" accept="image/*">
+
+    <button class="camera-btn" id="cameraTrigger">
+      <i class="ti ti-camera" style="font-size:18px;"></i>
+      カメラで今すぐ撮影する
+    </button>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment">
+
+    <p class="scene-label"><i class="ti ti-map-pin" style="font-size:13px;vertical-align:-1px;margin-right:4px;"></i>シーンを選ぶ（任意）</p>
+    <div class="scene-row" id="sceneRow">
+      <button class="scene-btn active" data-scene="AIが判断">AIが判断</button>
+      <button class="scene-btn" data-scene="仕事・オフィス">仕事</button>
+      <button class="scene-btn" data-scene="デート">デート</button>
+      <button class="scene-btn" data-scene="カジュアル・休日">カジュアル</button>
+      <button class="scene-btn" data-scene="冠婚葬祭">冠婚葬祭</button>
+      <button class="scene-btn" data-scene="就活・面接">就活</button>
+    </div>
+  </div>
+
+  <div id="previewSection" style="display:none">
+    <div class="preview-wrap">
+      <img id="previewImg" src="" alt="アップロードした写真">
+      <button class="remove-btn" id="removeBtn"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+
+  <div class="quota-bar">
+    <i class="ti ti-clock" style="font-size:15px;color:var(--color-text-secondary);flex-shrink:0;"></i>
+    <span class="quota-label">本日の診断</span>
+    <div class="quota-track"><div class="quota-fill" id="quotaFill" style="width:0%"></div></div>
+    <span class="quota-count" id="quotaCount">0 / 1回</span>
+  </div>
+
+  <div class="busy-banner" id="busyBanner">
+    <i class="ti ti-clock" style="font-size:15px;vertical-align:-2px;margin-right:5px;"></i>
+    ただいまアクセスが集中しています。しばらくしてからもう一度お試しください。
+  </div>
+
+  <button class="analyze-btn" id="analyzeBtn" disabled>
+    <i class="ti ti-sparkles" style="font-size:18px;"></i> 評価する
+  </button>
+
+  <div class="loading" id="loading">
+    <i class="ti ti-loader-2"></i>
+    <p>AIが分析中です...</p>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <div class="footer-links">
+    <a href="#">プライバシーポリシー</a>
+    <a href="#">免責事項</a>
+    <a href="mailto:your@email.com">お問い合わせ</a>
+  </div>
+</div>
+
+<script>
+const DAILY_LIMIT = 1;
+const GLOBAL_DAILY_LIMIT = 3000;
+let selectedScene = 'AIが判断';
+let imageBase64 = null;
+let imageMediaType = 'image/jpeg';
+
+function getTodayKey() { return 'diag_' + new Date().toISOString().slice(0,10); }
+function getGlobalKey() { return 'global_' + new Date().toISOString().slice(0,10); }
+function getUserCount() { try { return parseInt(localStorage.getItem(getTodayKey()) || '0'); } catch { return 0; } }
+function incUserCount() { try { localStorage.setItem(getTodayKey(), getUserCount() + 1); } catch {} }
+function getGlobalCount() { try { return parseInt(sessionStorage.getItem(getGlobalKey()) || '0'); } catch { return 0; } }
+function incGlobalCount() { try { sessionStorage.setItem(getGlobalKey(), getGlobalCount() + 1); } catch {} }
+
+function updateQuota() {
+  const used = getUserCount();
+  const pct = Math.min(100, Math.round(used / DAILY_LIMIT * 100));
+  document.getElementById('quotaFill').style.width = pct + '%';
+  document.getElementById('quotaCount').textContent = used + ' / ' + DAILY_LIMIT + '回';
+  if (used > 0) document.getElementById('quotaFill').style.background = 'var(--color-text-warning)';
+}
+
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const cameraInput = document.getElementById('cameraInput');
+const previewSection = document.getElementById('previewSection');
+const previewImg = document.getElementById('previewImg');
+const removeBtn = document.getElementById('removeBtn');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const loadingEl = document.getElementById('loading');
+const resultEl = document.getElementById('result');
+const busyBanner = document.getElementById('busyBanner');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+document.getElementById('cameraTrigger').addEventListener('click', () => cameraInput.click());
+uploadZone.addEventListener('dragover', e => e.preventDefault());
+uploadZone.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+cameraInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+  imageMediaType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = ev => {
+    imageBase64 = ev.target.result.split(',')[1];
+    previewImg.src = ev.target.result;
+    previewSection.style.display = 'block';
+    resultEl.style.display = 'none';
+    resultEl.innerHTML = '';
+    checkCanAnalyze();
+  };
+  reader.readAsDataURL(file);
+}
+
+function checkCanAnalyze() {
+  const ok = !!imageBase64 && getUserCount() < DAILY_LIMIT && getGlobalCount() < GLOBAL_DAILY_LIMIT;
+  analyzeBtn.disabled = !ok;
+  busyBanner.style.display = getGlobalCount() >= GLOBAL_DAILY_LIMIT ? 'block' : 'none';
+}
+
+removeBtn.addEventListener('click', () => {
+  imageBase64 = null;
+  previewImg.src = '';
+  previewSection.style.display = 'none';
+  fileInput.value = '';
+  cameraInput.value = '';
+  resultEl.style.display = 'none';
+  checkCanAnalyze();
+});
+
+document.getElementById('sceneRow').addEventListener('click', e => {
+  if (e.target.classList.contains('scene-btn')) {
+    document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    selectedScene = e.target.dataset.scene;
+  }
+});
+
+analyzeBtn.addEventListener('click', async () => {
+  if (!imageBase64 || getUserCount() >= DAILY_LIMIT || getGlobalCount() >= GLOBAL_DAILY_LIMIT) return;
+  analyzeBtn.disabled = true;
+  loadingEl.style.display = 'block';
+  resultEl.style.display = 'none';
+
+  const sceneInstruction = selectedScene === 'AIが判断'
+    ? 'まず写真から適切なシーンを判断してください。'
+    : `シーンは「${selectedScene}」です。`;
+
+  const prompt = `あなたはファッション・身だしなみの専門アドバイザーです。この全身写真を見て評価してください。${sceneInstruction}
+
+必ず以下のJSON形式のみで返答してください（マークダウン不要）：
+{"scene":"シーン名","score":75,"good_points":["良い点1","良い点2","良い点3"],"improve_points":["改善点1","改善点2","改善点3"],"advice":"総合アドバイス2〜3文"}
+
+評価基準：スコア0〜100。コーデバランス・清潔感・シーン適性を評価。顔・体型など生まれつきの外見は一切評価しない。「最低限の清潔感があるか」を軸に良い点と改善点をバランスよく。`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': 'YOUR_API_KEY_HERE'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: imageMediaType, data: imageBase64 } },
+          { type: 'text', text: prompt }
+        ]}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(i => i.text || '').join('');
+    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+    incUserCount(); incGlobalCount();
+    updateQuota();
+    showResult(parsed);
+  } catch {
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<div style="padding:1rem;color:var(--color-text-danger);font-size:13px;">エラーが発生しました。もう一度お試しください。</div>';
+  } finally {
+    loadingEl.style.display = 'none';
+    checkCanAnalyze();
+  }
+});
+
+function showResult(data) {
+  const sc = data.score;
+  const ck = sc >= 80 ? 'success' : sc >= 60 ? 'info' : 'warning';
+  const goodHtml = data.good_points.map(p => `<li><i class="ti ti-circle-check"></i><span>${p}</span></li>`).join('');
+  const impHtml = data.improve_points.map(p => `<li><i class="ti ti-alert-circle"></i><span>${p}</span></li>`).join('');
+  resultEl.innerHTML = `
+    <hr class="divider">
+    <div class="result-header">
+      <div class="score-ring" style="background:var(--color-background-${ck});border:2px solid var(--color-border-${ck});color:var(--color-text-${ck});">${sc}</div>
+      <h2>評価結果</h2>
+    </div>
+    <span class="scene-detected"><i class="ti ti-map-pin"></i> ${data.scene}</span>
+    <div class="section"><p class="section-title">良い点</p><ul class="good-list">${goodHtml}</ul></div>
+    <div class="section"><p class="section-title">改善ポイント</p><ul class="improve-list">${impHtml}</ul></div>
+    <div class="section"><p class="section-title">総合アドバイス</p><div class="advice-card">${data.advice}</div></div>
+    <button class="retry-btn" onclick="document.getElementById('removeBtn').click()">別の写真で試す</button>
+  `;
+  resultEl.style.display = 'block';
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+updateQuota();
+checkCanAnalyze();
+</script>
+</body>
+</html>
