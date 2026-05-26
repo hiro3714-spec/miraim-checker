@@ -263,11 +263,10 @@ analyzeBtn.addEventListener('click', async () => {
 評価基準：スコア0〜100。コーデバランス・清潔感・シーン適性を評価。顔・体型など生まれつきの外見は一切評価しない。「最低限の清潔感があるか」を軸に良い点と改善点をバランスよく。`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': 'YOUR_API_KEY_HERE'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
